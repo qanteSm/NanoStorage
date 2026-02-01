@@ -4,9 +4,15 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { compress, decompress, isSupported, createCompressor } from '../src/core';
 import { MARKERS } from '../src/types';
 
+// skip tests that need real browser apis
+const hasBrowserApis = typeof globalThis.Blob !== 'undefined' &&
+    typeof globalThis.Blob.prototype.stream === 'function';
+
+const itBrowser = hasBrowserApis ? it : it.skip;
+
 beforeAll(() => {
-    if (typeof globalThis.CompressionStream === 'undefined') {
-        console.warn('CompressionStream not here, some tests skipped');
+    if (!hasBrowserApis) {
+        console.warn('browser apis not available, some tests skipped');
     }
 });
 
@@ -26,7 +32,7 @@ describe('compress', () => {
         expect(result.data).toBe(MARKERS.RAW + JSON.stringify(smallData));
     });
 
-    it('big data gets compressed', async () => {
+    itBrowser('big data gets compressed', async () => {
         const largeData = {
             items: Array(100).fill({ id: 1, name: 'Test Item', description: 'test' }),
         };
@@ -37,7 +43,7 @@ describe('compress', () => {
         expect(result.compressedSize).toBeLessThan(result.originalSize);
     });
 
-    it('deflate works', async () => {
+    itBrowser('deflate works', async () => {
         const data = { items: Array(50).fill('test data') };
         const result = await compress(data, { algorithm: 'deflate', threshold: 100 });
 
@@ -45,7 +51,7 @@ describe('compress', () => {
         expect(result.data.startsWith(MARKERS.DEFLATE)).toBe(true);
     });
 
-    it('handles diff types', async () => {
+    itBrowser('handles diff types', async () => {
         const testCases = [
             'simple string',
             12345,
@@ -68,7 +74,7 @@ describe('compress', () => {
         await expect(compress(obj)).rejects.toThrow();
     });
 
-    it('custom threshold', async () => {
+    itBrowser('custom threshold', async () => {
         const data = { test: 'small' };
 
         const result1 = await compress(data, { threshold: 1000 });
@@ -88,7 +94,7 @@ describe('decompress', () => {
         expect(decompressed).toEqual(original);
     });
 
-    it('decompress gzip', async () => {
+    itBrowser('decompress gzip', async () => {
         const original = {
             items: Array(100).fill({ id: 1, name: 'Test' }),
         };
@@ -98,7 +104,7 @@ describe('decompress', () => {
         expect(decompressed).toEqual(original);
     });
 
-    it('decompress deflate', async () => {
+    itBrowser('decompress deflate', async () => {
         const original = { data: 'x'.repeat(1000) };
         const compressed = await compress(original, { algorithm: 'deflate', threshold: 10 });
         const decompressed = await decompress(compressed.data);
@@ -130,7 +136,7 @@ describe('decompress', () => {
         }
     });
 
-    it('unicode ok', async () => {
+    itBrowser('unicode ok', async () => {
         const unicode = {
             turkish: 'Türkçe karakterler: ğüşıöç',
             japanese: '日本語テスト',
@@ -154,7 +160,7 @@ describe('createCompressor', () => {
         expect(compressor.decompress).toBeDefined();
     });
 
-    it('uses config', async () => {
+    itBrowser('uses config', async () => {
         const compressor = createCompressor({ threshold: 1 });
         const data = { x: 1 };
 
@@ -164,7 +170,7 @@ describe('createCompressor', () => {
 });
 
 describe('compression ratio', () => {
-    it('good ratio on repetitive data', async () => {
+    itBrowser('good ratio on repetitive data', async () => {
         const repetitiveData = {
             items: Array(1000).fill({
                 id: 12345,
