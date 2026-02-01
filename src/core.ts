@@ -113,7 +113,15 @@ export async function decompress<T = unknown>(compressedString: string): Promise
     }
 
     const bytes = base64ToUint8Array(payload);
-    const stream = new Blob([bytes.buffer as ArrayBuffer]).stream();
+
+    // optimized: use ReadableStream directly instead of Blob
+    const stream = new ReadableStream({
+        start(controller) {
+            controller.enqueue(bytes);
+            controller.close();
+        }
+    });
+
     const decompressedStream = stream.pipeThrough(
         new DecompressionStream(algorithm)
     );

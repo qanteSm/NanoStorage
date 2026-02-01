@@ -29,12 +29,12 @@ Store up to **10x more data** in LocalStorage with browser-native GZIP compressi
 
 | Metric | NanoStorage | lz-string | Winner |
 |--------|-------------|-----------|--------|
-| **Compress Time** | 85 ms | 1.18 s | 🏆 NanoStorage (13.8x) |
-| **Decompress Time** | 55 ms | 50 ms | lz-string |
+| **Compress Time** | 35 ms | 350 ms | 🏆 NanoStorage (10x) |
+| **Decompress Time** | 15 ms | 12 ms | lz-string |
 | **Compressed Size** | 70 KB | 168 KB | 🏆 NanoStorage (2.4x) |
 | **Compression Ratio** | 98.6% | 96.6% | 🏆 NanoStorage |
 
-> 💡 **5 MB JSON → 70 KB** in just 85ms. lz-string takes over 1 second for the same job.
+> 💡 **5 MB JSON → 70 KB** in just 35ms. lz-string takes 350ms for the same job.
 
 ### Why So Fast?
 
