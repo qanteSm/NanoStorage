@@ -125,7 +125,10 @@ export async function decompress<T = unknown>(compressedString: string): Promise
     const decompressedStream = stream.pipeThrough(
         new DecompressionStream(algorithm)
     );
-    const text = await new Response(decompressedStream).text();
+
+    // use arrayBuffer + TextDecoder for faster conversion
+    const buffer = await new Response(decompressedStream).arrayBuffer();
+    const text = new TextDecoder().decode(buffer);
 
     return safeParse<T>(text);
 }

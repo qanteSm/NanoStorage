@@ -1,6 +1,6 @@
 {
   "name": "@qantesm/nanostorage",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "High-performance LocalStorage compression using native CompressionStream API. Zero-dependency, < 1KB, non-blocking.",
   "author": {
     "name": "Muhammet Ali Büyük",

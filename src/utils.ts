@@ -46,14 +46,26 @@ export function uint8ArrayToBase64(bytes: Uint8Array): string {
 }
 
 /**
- * base64 back to bytes
+ * base64 back to bytes - optimized
  */
 export function base64ToUint8Array(base64: string): Uint8Array {
     const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+
+    // unroll loop for better perf
+    let i = 0;
+    const end = len - 3;
+    for (; i < end; i += 4) {
+        bytes[i] = binary.charCodeAt(i);
+        bytes[i + 1] = binary.charCodeAt(i + 1);
+        bytes[i + 2] = binary.charCodeAt(i + 2);
+        bytes[i + 3] = binary.charCodeAt(i + 3);
+    }
+    for (; i < len; i++) {
         bytes[i] = binary.charCodeAt(i);
     }
+
     return bytes;
 }
 
